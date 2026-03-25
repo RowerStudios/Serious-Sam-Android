@@ -27,12 +27,12 @@ jobs:
     
     - name: Install NDK and CMake
       run: |
-        & "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat" --install "ndk;20.1.5948944" "cmake;3.10.2.4988404"
+        & "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat" --install "ndk;20.1.5948944" "cmake;3.10.2.4988404" "platforms;android-28" "build-tools;28.0.3"
     
     - name: Create local.properties
       run: |
-        "sdk.dir=$env:ANDROID_HOME" | Out-File -FilePath local.properties -Encoding UTF8
-        "ndk.dir=$env:ANDROID_HOME\ndk\20.1.5948944" | Out-File -FilePath local.properties -Encoding UTF8 -Append
+        Add-Content -Path local.properties -Value "sdk.dir=$env:ANDROID_HOME"
+        Add-Content -Path local.properties -Value "ndk.dir=$env:ANDROID_HOME\ndk\20.1.5948944"
     
     - name: Build Debug APK
       run: .\gradlew.bat assembleDebug
