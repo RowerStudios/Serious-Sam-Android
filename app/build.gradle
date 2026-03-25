@@ -1,0 +1,132 @@
+apply plugin: 'com.android.application'
+
+/**
+ * Get version and version code from environment or version.properties
+ */
+def getReleaseVersion() {
+    def SSA_VERSION = System.getenv('SSA_VERSION')
+
+    def versionPropsFile = file('../version.properties')
+    if (!versionPropsFile.isFile()) {
+        throw new RuntimeException("File not found '${versionPropsFile.getAbsolutePath()}'")
+    }
+
+    def is = new FileInputStream(versionPropsFile)
+    Properties versionProps = new Properties()
+    versionProps.load(is)
+    is.close()
+
+    return [
+            version: SSA_VERSION ? SSA_VERSION : versionProps['VERSION'].toString(),
+            versionCode: versionProps['VERSION_CODE'].toInteger(),
+    ]
+}
+
+/**
+ * Get signing configs from environment or signing.properties
+ */
+def getSigningInfo() {
+    def KEY_ALIAS = System.getenv('KEY_ALIAS')
+    def STORE_FILE = System.getenv('STORE_FILE')
+    def STORE_PASSWORD = System.getenv('STORE_PASSWORD')
+    def KEY_PASSWORD = System.getenv('KEY_PASSWORD')
+
+    if (KEY_ALIAS && STORE_FILE && STORE_PASSWORD && KEY_PASSWORD) {
+        android {
+            signingConfigs {
+                app {
+                    keyAlias KEY_ALIAS.trim()
+                    keyPassword KEY_PASSWORD.trim()
+                    storeFile file(STORE_FILE.trim())
+                    storePassword STORE_PASSWORD.trim()
+                    v2SigningEnabled false
+                }
+            }
+        }
+        return android.signingConfigs.app
+    }
+
+    def propFile = file('../signing.properties')
+    if (propFile.canRead()) {
+        Properties props = new Properties()
+
+        def is = new FileInputStream(propFile);
+        props.load(is)
+        is.close()
+
+        android {
+            signingConfigs {
+                app {
+                    keyAlias props['KEY_ALIAS'].trim()
+                    keyPassword props['KEY_PASSWORD'].trim()
+                    storeFile file(props['STORE_FILE'].trim())
+                    storePassword props['STORE_PASSWORD'].trim()
+                    v2SigningEnabled false
+                }
+            }
+        }
+        return android.signingConfigs.app
+    }
+}
+
+android {
+
+    def signing = getSigningInfo()
+    def ver = getReleaseVersion()
+
+    println("Serious-Sam-Android v${ver.version} (${ver.versionCode})")
+    if (signing) {
+        println("Signign as '${signing.keyAlias}' (keyStore: $signing.storeFile)")
+    }
+
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.github.aarcangeli.serioussamandroid"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode ver.versionCode
+        versionName ver.version
+        setProperty("archivesBaseName", "SeriousSamAndroid-v$versionName")
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        externalNativeBuild {
+            cmake {
+                cppFlags "-fexceptions"
+                abiFilters "armeabi-v7a"
+                arguments "-DSSA_VERSION=" + versionName
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            if (signing) {
+                signingConfig signing
+            }
+            debuggable true
+            jniDebuggable true
+        }
+        release {
+            if (signing) {
+                signingConfig signing
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "../CMakeLists.txt"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    // KeyboardHeightProvider is now implemented locally
+}

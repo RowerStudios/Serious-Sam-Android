@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Graphics">
+        <ListPreference
+            android:defaultValue="Full"
+            android:entries="@array/ResolutionScaleFactorEntries"
+            android:entryValues="@array/FullHalf"
+            android:key="scale_FactorSet"
+            android:summary="%s"
+            android:title="Screen resolution" />
+        <ListPreference
+            android:defaultValue="On"
+            android:entries="@array/DinamicUIScaleEntries"
+            android:entryValues="@array/OnOff"
+            android:key="din_uiScale"
+            android:summary="%s"
+            android:title="Dinamic UI Scale" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Inputs">
+        <ListPreference
+            android:defaultValue="Auto"
+            android:entries="@array/ShowTouchControllerEntries"
+            android:entryValues="@array/AutoYesNo"
+            android:key="showTouchController"
+            android:summary="%s"
+            android:title="Show touch controller" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="use_gyroscope"
+            android:summary="Tilts the device to move the view."
+            android:title="Use Gyroscope" />
+        <com.github.aarcangeli.serioussamandroid.preferences.SeekBarPreference
+            android:defaultValue="100"
+            android:key="gyro_sensibility"
+            android:max="200"
+            android:summary="%s%%"
+            android:text="%"
+            android:title="Gyroscope sensibility" />
+        <com.github.aarcangeli.serioussamandroid.preferences.SeekBarPreference
+            android:defaultValue="100"
+            android:key="aimView_sensibility"
+            android:max="200"
+            android:summary="%s%%"
+            android:text="%"
+            android:title="Drag sensibility" />
+        <com.github.aarcangeli.serioussamandroid.preferences.SeekBarPreference
+            android:defaultValue="70"
+            android:key="input_opacity"
+            android:max="100"
+            android:summary="%s%%"
+            android:text="%"
+            android:title="Input Opacity" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Controller">
+        <com.github.aarcangeli.serioussamandroid.preferences.SeekBarPreference
+            android:defaultValue="20"
+            android:key="ctrl_deadZone"
+            android:max="100"
+            android:summary="%s%%"
+            android:text="%"
+            android:title="Dead zone" />
+        <com.github.aarcangeli.serioussamandroid.preferences.SeekBarPreference
+            android:defaultValue="100"
+            android:key="ctrl_aimSensibility"
+            android:max="200"
+            android:summary="%s%%"
+            android:text="%"
+            android:title="View sensibility" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Debug">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="hud_iStats"
+            android:summary="Draw gpu stats on screen."
+            android:title="Show Stats" />
+    </PreferenceCategory>
+</PreferenceScreen>
